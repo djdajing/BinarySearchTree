@@ -13,7 +13,7 @@ void search(BinaryTree bst ,BinaryTree::TreeNode *root, string word)
 }
 
 
-BinaryTree::TreeNode * dir_to_BST(BinaryTree& bst,vector<string> files_in_dir)
+BinaryTree::TreeNode * dirvec_to_BST(BinaryTree &bst, vector<string> files_in_dir)
 {
     struct BinaryTree::TreeNode *root;
     cout<<"Inserting  ... "<<endl;
@@ -82,7 +82,7 @@ void print_files_in_dir(vector<string> files_in_dir)
     std::cout << '\n';
 }
 
-vector<string>  dir_to_list(string dir)
+vector<string>  dir_to_vec(string dir)
 {
     vector<string> files_vec;
     boost::filesystem::path dir_path(dir);
@@ -111,24 +111,25 @@ void match(vector<string>& files_in_dir, BinaryTree& bst)
     }
 }
 
-int main()
+void genBst(string & path,BinaryTree& bst)
 {
-    vector<string> files_in_dir = dir_to_list("/home/dj/Multilanguage PIS/BinarySearchTree/test_folder");
 
-
-    BinaryTree bst = BinaryTree();
-    bst.tree = dir_to_BST(bst,files_in_dir); //convert dir to binary tree
-    match(files_in_dir,bst); // check if num node match num files
+    vector<string> files_in_dir_vec = dir_to_vec(path);
+    bst.tree = dirvec_to_BST(bst, files_in_dir_vec); //convert dir to binary tree
+    match(files_in_dir_vec,bst); // check if num node match num files
 
     if (DEBUG_MAIN)
     {
-        print_files_in_dir(files_in_dir);
-        cout << "num of files :"<<files_in_dir.size() << endl;
+        print_files_in_dir(files_in_dir_vec);
+        cout << "num of files :"<<files_in_dir_vec.size() << endl;
         cout << "num node : "<<bst.numNode<<endl;
     }
+}
 
-    //test(files_in_dir);
+int main()
+{
+    BinaryTree bst = BinaryTree();
+    string p = "/home/dj/Multilanguage PIS/BinarySearchTree/test_folder";
+    genBst(p,bst);
 
-
-    return 0;
 }
