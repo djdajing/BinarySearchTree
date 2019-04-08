@@ -4,6 +4,7 @@
 #include "BinaryTree.h"
 //#include "/home/dj/lib/boost_1_65_1/boost/filesystem.hpp"
 
+bool DEBUG_MAIN = false;
 void search(BinaryTree bst ,BinaryTree::TreeNode *root, string word)
 {
     queue<bool> tracker_queue;
@@ -11,35 +12,43 @@ void search(BinaryTree bst ,BinaryTree::TreeNode *root, string word)
     cout<<word<<" FROM: "<<answer->data<<endl;
 }
 
-void test(list<string>mylist)
+
+BinaryTree::TreeNode * dir_to_BST(BinaryTree& bst,vector<string> files_in_dir)
+{
+    struct BinaryTree::TreeNode *root;
+    cout<<"Inserting  ... "<<endl;
+    root = bst.insert_by_sorted_vec(files_in_dir, 0, files_in_dir.size());
+    return root;
+}
+
+void test_dir_to_BST(vector<string> files_in_dir)
 {
     BinaryTree bst = BinaryTree();
-    struct BinaryTree::TreeNode *root=bst.newEmptyNode();
-//    string mylist[] = {"a","b","c","d","e","f","g","h","i","j"};
-//    root = bst.insert(root, "e");
-//    bst.insert(root, "c");
-//    bst.insert(root, "h");
-//    bst.insert(root, "b");
-//    bst.insert(root, "d");
-//    bst.insert(root, "a");
-//    bst.insert(root, "g");
-//    bst.insert(root, "j");
+    struct BinaryTree::TreeNode *root;
+    cout<<"Inserting  ... "<<endl;
+    root = bst.insert_by_sorted_vec(files_in_dir, 0, files_in_dir.size());
+
+//    string files_in_dir[] = {"a","b","c","d","e","f","g","h","i","j"};
+//    root = bst.insert_by_string_data(root, "e");
+//    bst.insert_by_string_data(root, "c");
+//    bst.insert_by_string_data(root, "h");
+//    bst.insert_by_string_data(root, "b");
+//    bst.insert_by_string_data(root, "d");
+//    bst.insert_by_string_data(root, "a");
+//    bst.insert_by_string_data(root, "g");
+//    bst.insert_by_string_data(root, "j");
 //    bst.ins ert(root, "i");
-//    bst.insert(root, "f");
-//    bst.insert(root, "k");
+//    bst.insert_by_string_data(root, "f");
+//    bst.insert_by_string_data(root, "k");
 
 
-    ///TODO: make list insert from middle by middle //
-
-
-
-
-    // print inoder traversal of the BST
-    bst.inorder(root);
+    cout<<"Printing order  ... "<<endl;
+    bst.inorder(root,true);
 
 
     queue<bool> tracker_queue;
 
+    cout<<"Testing  ... "<<endl;
     search(bst,root,"apple");
     search(bst,root,"a");
     search(bst,root,"boy");
@@ -65,38 +74,61 @@ void test(list<string>mylist)
 
 }
 
-void check_listitem(list<string>mylist)
+void print_files_in_dir(vector<string> files_in_dir)
 {
-    std::cout << "mylist contains:";
-    for (auto it=mylist.begin(); it!=mylist.end(); ++it)
+    std::cout << "dir contains:";
+    for (auto it=files_in_dir.begin(); it!=files_in_dir.end(); ++it)
         std::cout << ' ' << *it;
     std::cout << '\n';
 }
 
-list<string>  dir_to_list(string dir)
+vector<string>  dir_to_list(string dir)
 {
-    list<string> list_list;
+    vector<string> files_vec;
     boost::filesystem::path dir_path(dir);
     for (auto i = boost::filesystem::directory_iterator(dir_path); i != boost::filesystem::directory_iterator(); i++)
     {
         if (!is_directory(i->path()))
         {
             string filename = i->path().stem().string();
-            list_list.push_back(filename);
+            files_vec.push_back(filename);
         }
         else
             continue;
     }
-    list_list.sort();
-    return list_list;
+    sort(files_vec.begin(),files_vec.end());
+    return files_vec;
 
+}
+
+void match(vector<string>& files_in_dir, BinaryTree& bst)
+{
+    bst.inorder(bst.tree,false);
+    if (files_in_dir.size()!= bst.numNode)
+    {
+        cerr <<"ERROR FILE NODE MISMATCHED :  "<< files_in_dir.size() << " files but "<<bst.numNode<< " nodes"<<endl;
+        exit(EXIT_FAILURE);
+    }
 }
 
 int main()
 {
-    list<string> mylist = dir_to_list("/home/dj/Multilanguage PIS/BinarySearchTree/test_folder");
-    check_listitem(mylist);
-    //test(mylist);
+    vector<string> files_in_dir = dir_to_list("/home/dj/Multilanguage PIS/BinarySearchTree/test_folder");
+
+
+    BinaryTree bst = BinaryTree();
+    bst.tree = dir_to_BST(bst,files_in_dir); //convert dir to binary tree
+    match(files_in_dir,bst); // check if num node match num files
+
+    if (DEBUG_MAIN)
+    {
+        print_files_in_dir(files_in_dir);
+        cout << "num of files :"<<files_in_dir.size() << endl;
+        cout << "num node : "<<bst.numNode<<endl;
+    }
+
+    //test(files_in_dir);
+
 
     return 0;
 }

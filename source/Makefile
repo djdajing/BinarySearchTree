@@ -8,7 +8,7 @@ OUTPUT = ../test
 MAIN_CPP = main.cpp BinaryTree.cpp
 
 all :
-	$(CC) $(MAIN_CPP) -o $(OUTPUT)  -static -static-libgcc -static-libstdc++ $(CCFLAG) $(BOOSTFLAG)
+	$(CC) -g $(MAIN_CPP) -o $(OUTPUT)  -static -static-libgcc -static-libstdc++ $(CCFLAG) $(BOOSTFLAG)
 
 clean : 
 	$(RM) *.o $(OUTPUT)

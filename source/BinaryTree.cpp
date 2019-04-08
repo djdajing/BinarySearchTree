@@ -8,62 +8,105 @@ bool DEBUG = false;
 //bool DEBUG = true;
 BinaryTree::TreeNode *BinaryTree::newNode(string data)
 {
-    auto new_node =  (struct TreeNode *)malloc(sizeof(struct TreeNode));
-    new_node->data = data;
+    if (DEBUG)cout<<"create new node : "<<data <<endl;
+    //auto new_node = (struct TreeNode *)malloc(sizeof(struct TreeNode));
+    TreeNode * new_node = new TreeNode();
     new_node->left = NULL;
     new_node->right = NULL;
     new_node->parent = NULL;
-
+    new_node->data = data;
     return new_node;
 }
-
-BinaryTree::TreeNode *BinaryTree::insert(struct TreeNode* node, string data)
+BinaryTree::TreeNode *BinaryTree::insert_by_string_data(struct TreeNode *node, string data)
 {
+    if (DEBUG)
+        cout<<"inserting : "<<data<<endl;
     //insertion of first item
     if (node == NULL )
         return newNode(data);
 
+    if (DEBUG)
+        cout<<"vs node->data : "<<node->data<<endl;
     if (data < node->data)
     {
-        TreeNode* Ichild = insert(node->left, data);
-        node->left  = Ichild;
-        Ichild->parent = node;
+        TreeNode* lchild = insert_by_string_data(node->left, data);
+        node->left  = lchild;
+        lchild->parent = node;
     }
 
     else if (data > node->data)
     {
-        TreeNode* rchild =insert(node->right, data);
+        TreeNode* rchild = insert_by_string_data(node->right, data);
         node->right = rchild;
         rchild->parent= node;
     }
 
     return node;
 }
+BinaryTree::TreeNode *BinaryTree::insert_by_sorted_vec(vector<string> &vec, int start, int end)
+{
+    if (DEBUG)
+        cout << "start :"<<start<<" end : "<<end<<endl;
+    /* Base Case */
+    if (start > end)
+    {
+        if (DEBUG) cout<<"in base"<<endl;
+        return NULL;
+    }
 
-void BinaryTree::inorder(BinaryTree::TreeNode *root)
+    /* Get the middle element and make it root */
+    int mid = (start + end)/2;
+    if (mid>=vec.size())
+        return NULL;
+    if (DEBUG)
+    {
+        cout << "start :"<<start<<" end : "<<end<< " mid :"<<vec[mid]<<" : "<<mid<<endl;
+    }
+
+    string data = vec[mid];
+    TreeNode *root = newNode(data);
+
+    if (DEBUG)cout<<"going left of : "<<data<<endl;
+    root->left = insert_by_sorted_vec(vec, start, mid - 1);
+    if (root->left)
+    {
+        root->left->parent = root;
+        if (DEBUG)
+            cout <<"parent of "<<root->left->data<<":"<<root->left->parent->data<<endl;
+    }
+
+    if (DEBUG)cout<<"going right of :"<<data<<endl;
+    root->right = insert_by_sorted_vec(vec, mid + 1, end);
+    if (root->right)
+    {
+        root->right->parent = root;
+        if (DEBUG)
+            cout <<"parent of "<<root->right->data<<":"<<root->right->parent->data<<endl;
+    }
+    return root;
+}
+
+void BinaryTree::inorder(BinaryTree::TreeNode *root,bool print)
 {
     if (root != NULL)
     {
-        inorder(root->left);
-        cout<<"Node : "<< root->data;
-        if (root->parent == NULL)
-            cout<<" Parent : NULL"<<endl;
-        else
-            cout<<" Parent : "<< root->parent->data<<endl;
-        inorder(root->right);
+        inorder(root->left,print);
+        numNode+=1;
+        if (print)
+        {
+            cout<<"Node : "<< root->data;
+            if (root->parent == NULL)
+                cout<<" Parent : NULL"<<endl;
+            else
+                cout<<" Parent : "<< root->parent->data<<endl;
+        }
+        inorder(root->right,print);
     }
 }
 BinaryTree::TreeNode *BinaryTree::newEmptyNode()
 {
     return nullptr;
 }
-BinaryTree::BinaryTree(){}
-
-//bool BinaryTree::isLeafNode(string right_child_data,string left_child_data)
-//{
-//    if (right_child_data.empty() && left_child_data.empty())
-//        return true;
-//}
 
 bool BinaryTree::isLeafNode(TreeNode* node)
 {
@@ -109,7 +152,7 @@ BinaryTree::TreeNode *BinaryTree::lookUp(struct TreeNode *node, string value, st
         }
         else
         {
-            cout<<"return parent"<<endl;
+            if (DEBUG) cout<<"return parent"<<endl;
             //return node->parent;
         }
     }
@@ -179,3 +222,5 @@ BinaryTree::TreeNode *BinaryTree::lookUp(struct TreeNode *node, string value, st
 
 
 }
+
+BinaryTree::BinaryTree(){}
